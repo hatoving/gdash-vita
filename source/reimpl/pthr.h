@@ -23,6 +23,8 @@ extern "C" {
 #include <pthread.h>
 #include <semaphore.h>
 
+#define PTHREAD_RWLOCK_INITIALIZER_SOLOADER  { { 0 } }
+
 typedef struct {
     pthread_attr_t *real_ptr; // replaces `uint32_t flags;`
     int32_t magic; // replaces `void * stack_base;`
@@ -79,6 +81,12 @@ int pthread_attr_init_soloader(pthread_attr_t_bionic *attr);
 int pthread_attr_destroy_soloader(pthread_attr_t_bionic *attr);
 int pthread_attr_setdetachstate_soloader(pthread_attr_t_bionic *attr, int state);
 int pthread_attr_setstacksize_soloader(pthread_attr_t_bionic *attr, size_t stacksize);
+
+int pthread_rwlock_init_soloader(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr);
+int pthread_rwlock_rdlock_soloader(pthread_rwlock_t *rwlock);
+int pthread_rwlock_wrlock_soloader(pthread_rwlock_t *rwlock);
+int pthread_rwlock_unlock_soloader(pthread_rwlock_t *rwlock);
+int pthread_rwlock_destroy_soloader(pthread_rwlock_t *rwlock);
 
 int pthread_setname_np_soloader(pthread_t thread, const char *thread_name);
 

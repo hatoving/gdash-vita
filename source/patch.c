@@ -11,13 +11,16 @@
  */
 
 #include "patch.h"
+#include "openssl_patch.h"
+#include "utils/logger.h"
 
 #include <kubridge.h>
+#include <vitaGL.h>
 #include <so_util/so_util.h>
 
 extern so_module so_mod;
 
 void so_patch(void) {
-    // Sample hook
-    //hook_addr((uintptr_t)so_symbol(&so_mod, "_ZN6glitch2os7Printer5printEPKcz"), (uintptr_t)&hookedFunction);
+    patch_openssl();
+    //hook_addr(so_symbol(&so_mod, "_ZN4FMOD14ChannelControl9setVolumeEf"), (uintptr_t)FMOD_ChannelControl_SetVolume); //dummy func for now
 }

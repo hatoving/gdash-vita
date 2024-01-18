@@ -8,6 +8,7 @@
  * Copyright (C) 2022      Rinnegatamante
  * Copyright (C) 2022      GrapheneCt
  * Copyright (C) 2022-2023 Volodymyr Atamanenko
+ * Copyright (C) 2024      hatoving
  *
  * This software may be modified and distributed under the terms
  * of the MIT license. See the LICENSE file for details.
@@ -186,6 +187,52 @@ int pthread_create_soloader(pthread_t *thread, const pthread_attr_t_bionic *attr
     }
 
     return ret;
+}
+
+int pthread_rwlock_init_soloader(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr) { 
+    pthread_rwlock_t *rw = calloc(1, sizeof(pthread_rwlock_t));
+    if (!rw)
+        return -1;
+
+    *rw = PTHREAD_RWLOCK_INITIALIZER;
+
+    int ret = pthread_rwlock_init(rw, attr);
+    if (ret < 0) {
+        free(rw);
+        return -1;
+    }
+
+    *rwlock = rw;
+    return 0;
+}
+
+int pthread_rwlock_rdlock_soloader(pthread_rwlock_t *rwlock) {
+    return pthread_rwlock_rdlock(rwlock);
+}
+
+int pthread_rwlock_wrlock_soloader(pthread_rwlock_t *rwlock) {
+    return pthread_rwlock_wrlock(rwlock);
+}
+
+int pthread_rwlock_unlock_soloader(pthread_rwlock_t *rwlock) {
+    if (!rwlock || !(*rwlock))
+        return -1;
+
+    int ret = pthread_rwlock_unlock(*rwlock);
+
+    pthread_rwlock_destroy_soloader(*rwlock);
+
+    free(*rwlock);
+    *rwlock = NULL;
+
+    return ret;
+}
+
+int pthread_rwlock_destroy_soloader(pthread_rwlock_t *rwlock) {
+    if (!rwlock)
+        return -1;
+
+    return pthread_rwlock_destroy(rwlock);
 }
 
 int pthread_mutexattr_init_soloader(pthread_mutexattr_t *attr)

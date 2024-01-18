@@ -18,6 +18,8 @@ extern "C" {
 #endif
 
 void so_patch();
+int ret0();
+int ret1();
 
 #ifdef __cplusplus
 };

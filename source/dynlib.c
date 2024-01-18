@@ -61,6 +61,8 @@
 #include "reimpl/pthr.h"
 #include "reimpl/sys.h"
 
+#include "fmod.h"
+
 extern void * _ZNSt9exceptionD2Ev;
 extern void * _ZSt17__throw_bad_allocv;
 extern void * _ZSt9terminatev;
@@ -128,6 +130,37 @@ extern const short *BIONIC_tolower_tab_;
 extern const short *BIONIC_toupper_tab_;
 
 static FILE __sF_fake[3];
+
+// used this to print out the shaders i need in case it fucks up anything
+/*void glShaderSourceHookNew(GLuint shader, GLsizei count, const GLchar **string, const GLint *length) {
+    sceClibPrintf("//// SHADER SOURCE ////\n");
+    size_t totalLength = 0;
+    for (int i = 0; i < count; ++i) {
+        totalLength += length ? length[i] : strlen(string[i]);
+    }
+
+    // Allocate memory for the concatenated string plus null terminator
+    char *result = (char *)malloc(totalLength + 1);
+    if (!result) {
+        // Handle memory allocation failure
+        return NULL;
+    }
+
+    // Concatenate the strings
+    size_t offset = 0;
+    for (int i = 0; i < count; ++i) {
+        size_t currentLength = length ? length[i] : strlen(string[i]);
+        memcpy(result + offset, string[i], currentLength);
+        offset += currentLength;
+    }
+
+    // Null-terminate the result
+    result[offset] = '\0';
+    sceClibPrintf("%s", result);
+    sceClibPrintf("\n//// SHADER SOURCE END ////\n");
+
+    glShaderSource(shader, count, string, length);
+}*/
 
 int __atomic_dec(volatile int *ptr) {
     return __sync_fetch_and_sub (ptr, 1);
@@ -262,6 +295,7 @@ so_default_dynlib default_dynlib[] = {
         { "acos", (uintptr_t)&acos },
         { "acosf", (uintptr_t)&acosf },
         { "asin", (uintptr_t)&asin },
+        { "asinh", (uintptr_t)&asinh },
         { "asinf", (uintptr_t)&asinf },
         { "atan", (uintptr_t)&atan },
         { "atan2", (uintptr_t)&atan2 },
@@ -447,7 +481,6 @@ so_default_dynlib default_dynlib[] = {
         { "truncate", (uintptr_t)&truncate },
         { "unlink", (uintptr_t)&unlink },
         { "write", (uintptr_t)&write },
-
 
         // *printf, *scanf
         { "snprintf", (uintptr_t)&snprintf },
@@ -699,7 +732,6 @@ so_default_dynlib default_dynlib[] = {
         { "sched_get_priority_min", (uintptr_t)&sched_get_priority_min },
         { "sched_yield", (uintptr_t)&sched_yield },
 
-
         // wchar, wctype
         { "btowc", (uintptr_t)&btowc },
         { "iswalpha", (uintptr_t)&iswalpha },
@@ -882,6 +914,128 @@ so_default_dynlib default_dynlib[] = {
         { "inflateInit_", (uintptr_t)&inflateInit_ },
         { "inflateReset", (uintptr_t)&inflateReset },
         { "uncompress", (uintptr_t)&uncompress },
+
+        // pthread
+		{ "pthread_attr_destroy", (uintptr_t)&pthread_attr_destroy_soloader },
+		{ "pthread_attr_init", (uintptr_t) &pthread_attr_init_soloader },
+		{ "pthread_attr_setdetachstate", (uintptr_t) &pthread_attr_setdetachstate_soloader },
+		{ "pthread_attr_setstacksize", (uintptr_t) &pthread_attr_setstacksize_soloader },
+		{ "pthread_cond_broadcast", (uintptr_t) &pthread_cond_broadcast_soloader },
+		{ "pthread_cond_destroy", (uintptr_t) &pthread_cond_destroy_soloader },
+		{ "pthread_cond_init", (uintptr_t) &pthread_cond_init_soloader },
+		{ "pthread_cond_signal", (uintptr_t) &pthread_cond_signal_soloader },
+		{ "pthread_cond_timedwait", (uintptr_t) &pthread_cond_timedwait_soloader },
+		{ "pthread_cond_wait", (uintptr_t) &pthread_cond_wait_soloader },
+		{ "pthread_create", (uintptr_t) &pthread_create_soloader },
+		{ "pthread_detach", (uintptr_t) &pthread_detach_soloader },
+		{ "pthread_equal", (uintptr_t) &pthread_equal_soloader },
+		{ "pthread_exit", (uintptr_t)&pthread_exit },
+		{ "pthread_getschedparam", (uintptr_t) &pthread_getschedparam_soloader },
+		{ "pthread_getspecific", (uintptr_t)&pthread_getspecific },
+		{ "pthread_join", (uintptr_t) &pthread_join_soloader },
+		{ "pthread_key_create", (uintptr_t)&pthread_key_create },
+		{ "pthread_key_delete", (uintptr_t)&pthread_key_delete },
+		{ "pthread_kill", (uintptr_t)&pthread_kill_soloader },
+		{ "pthread_mutex_destroy", (uintptr_t) &pthread_mutex_destroy_soloader },
+		{ "pthread_mutex_init", (uintptr_t) &pthread_mutex_init_soloader },
+		{ "pthread_mutex_lock", (uintptr_t) &pthread_mutex_lock_soloader },
+		{ "pthread_mutex_trylock", (uintptr_t) &pthread_mutex_trylock_soloader },
+		{ "pthread_mutex_unlock", (uintptr_t) &pthread_mutex_unlock_soloader },
+		{ "pthread_mutexattr_destroy", (uintptr_t) &pthread_mutexattr_destroy_soloader },
+		{ "pthread_mutexattr_init", (uintptr_t) &pthread_mutexattr_init_soloader },
+		{ "pthread_mutexattr_settype", (uintptr_t) &pthread_mutexattr_settype_soloader },
+		{ "pthread_once", (uintptr_t)&pthread_once_soloader },
+		{ "pthread_self", (uintptr_t) &pthread_self_soloader },
+		{ "pthread_setname_np", (uintptr_t) &pthread_setname_np_soloader },
+		{ "pthread_setschedparam", (uintptr_t) &pthread_setschedparam_soloader },
+		{ "pthread_setspecific", (uintptr_t)&pthread_setspecific },
+		{ "pthread_sigmask", (uintptr_t)&ret0 },
+        { "pthread_rwlock_init", (uintptr_t)&pthread_rwlock_init_soloader},
+        { "pthread_rwlock_rdlock", (uintptr_t)&pthread_rwlock_rdlock_soloader},
+        { "pthread_rwlock_wrlock", (uintptr_t)&pthread_rwlock_wrlock_soloader},
+        { "pthread_rwlock_unlock", (uintptr_t)&pthread_rwlock_unlock_soloader},
+        { "pthread_rwlock_destroy", (uintptr_t)&pthread_rwlock_destroy_soloader},
+
+		{ "sem_destroy", (uintptr_t) &sem_destroy_soloader },
+		{ "sem_getvalue", (uintptr_t) &sem_getvalue_soloader },
+		{ "sem_init", (uintptr_t) &sem_init_soloader },
+		{ "sem_post", (uintptr_t) &sem_post_soloader },
+		{ "sem_timedwait", (uintptr_t) &sem_timedwait_soloader },
+		{ "sem_trywait", (uintptr_t) &sem_trywait_soloader },
+		{ "sem_wait", (uintptr_t) &sem_wait_soloader },
+
+		{ "sched_get_priority_max", (uintptr_t)&sched_get_priority_max },
+		{ "sched_get_priority_min", (uintptr_t)&sched_get_priority_min },
+		{ "sched_yield", (uintptr_t)&sched_yield },
+
+        //inet
+        { "inet_pton", (uintptr_t)&inet_pton },
+
+        // FMOD
+        {"_ZN4FMOD3DSP15getMeteringInfoEP22FMOD_DSP_METERING_INFOS2_", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl11getUserDataEPPv", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl6getDSPEiPPNS_3DSPE", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD3DSP17setParameterFloatEif", (uintptr_t)&FMOD_ReturnOK},
+        {"FMOD_System_Create", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System10getVersionEPj", (uintptr_t)&FMOD_ReturnOK},
+        {"FMOD_Debug_Initialize", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System19getStreamBufferSizeEPjS1_", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System16setDSPBufferSizeEji", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System16getDSPBufferSizeEPjPi", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System17getSoftwareFormatEPiP16FMOD_SPEAKERMODES1_", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System17setSoftwareFormatEi16FMOD_SPEAKERMODEi", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System4initEijPv", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System18createChannelGroupEPKcPPNS_12ChannelGroupE", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl13setVolumeRampEb", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD3DSP18setMeteringEnabledEbb", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD12ChannelGroup8addGroupEPS0_bPPNS_13DSPConnectionE", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System15createDSPByTypeE13FMOD_DSP_TYPEPPNS_3DSPE", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD3DSP16setParameterBoolEib", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl6addDSPEiPNS_3DSPE", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System11mixerResumeEv", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System6updateEv", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System12mixerSuspendEv", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl9setPausedEb", (uintptr_t)&FMOD_ReturnOK},
+        {"FMOD_Channel_GetFadePoints", (uintptr_t)&FMOD_ReturnOK},
+        {"FMOD_Channel_GetDSPClock", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl11getDSPClockEPyS1_", (uintptr_t)&FMOD_ReturnOK},
+        {"FMOD_Channel_RemoveFadePoints", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl9setVolumeEf", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD5Sound12getOpenStateEP14FMOD_OPENSTATEPjPbS4_", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System12createStreamEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD5Sound12setLoopCountEi", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD5Sound7releaseEv", (uintptr_t)&FMOD_ReturnOK},
+        {"FMOD_Memory_GetStats", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System11getCPUUsageEP14FMOD_CPU_USAGE", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl4stopEv", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System5closeEv", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System7releaseEv", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD12ChannelGroup7releaseEv", (uintptr_t)&FMOD_ReturnOK},
+        {"FMOD_System_LockDSP", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD7Channel13getLoopPointsEPjjS1_j", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD7Channel11getPositionEPjj", (uintptr_t)&FMOD_ReturnOK},
+        {"FMOD_Channel_GetDelay", (uintptr_t)&FMOD_ReturnOK},
+        {"FMOD_System_UnlockDSP", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl11setUserDataEPv", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl9getVolumeEPf", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl8getPitchEPf", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD7Channel11setPositionEjj", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD7Channel15getCurrentSoundEPPNS_5SoundE", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD5Sound9getLengthEPjj", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl8setPitchEf", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl9getPausedEPb", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl12addFadePointEyf", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD7Channel12setLoopCountEi", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl8setDelayEyyb", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD7Channel13setLoopPointsEjjjj", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System9playSoundEPNS_5SoundEPNS_12ChannelGroupEbPPNS_7ChannelE", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl11setCallbackEPF11FMOD_RESULTP19FMOD_CHANNELCONTROL24FMOD_CHANNELCONTROL_TYPE33FMOD_CHANNELCONTROL_CALLBACK_TYPEPvS6_E", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD12ChannelGroup14getNumChannelsEPi", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD12ChannelGroup10getChannelEiPPNS_7ChannelE", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System11createSoundEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System7lockDSPEv", (uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD6System9unlockDSPEv", (uintptr_t)&FMOD_ReturnOK},
+
 };
 
 void resolve_imports(so_module* mod) {

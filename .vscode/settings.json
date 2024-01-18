@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "kubridge.h": "c",
+        "falsojni_impl.h": "c",
+        "functional": "c",
+        "*.ipp": "c",
+        "crypt.h": "c",
+        "so_util.h": "c",
+        "crypto.h": "c",
+        "evp.h": "c"
+    }
+}
