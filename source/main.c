@@ -27,8 +27,6 @@
 #include <psp2/kernel/processmgr.h>
 #include <sched.h>
 
-#include "fmod.h"
-
 int _newlib_heap_size_user = 256 * 1024 * 1024;
 
 #ifdef USE_SCELIBC_IO
@@ -44,6 +42,7 @@ int main() {
     sceSysmoduleLoadModule(SCE_SYSMODULE_NET);
     int ret = sceNetShowNetstat();
     SceNetInitParam initparam;
+    
     if (ret == SCE_NET_ERROR_ENOTINIT) {
         initparam.memory = malloc(141 * 1024);
         initparam.size = 141 * 1024;
@@ -65,7 +64,7 @@ int main() {
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin");
     //jboolean (* Cocos2D_KeyDown)(JNIEnv *jni, jobject thiz, jint keyCode) = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown");
     void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove)(JNIEnv * env, jobject thiz, jintArray ids, jfloatArray xs, jfloatArray ys)
-            = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove");
+        = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove");
     void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd)(JNIEnv * env, jobject thiz, jint id, jfloat x, jfloat y)
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd");
 
@@ -77,8 +76,6 @@ int main() {
 
     int lastX[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
     int lastY[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
-
-    // ... do some initialization
 
     while (1) {
         SceTouchData touch;

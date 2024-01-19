@@ -53,7 +53,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -g -std=gnu++20 -Wno-write-strings -Wno-ps
 
 add_executable(${CMAKE_PROJECT_NAME}
                source/main.c
-               source/fmod.c
                source/openssl_patch.c
                source/dynlib.c
                source/falso_jni_impl.c
@@ -96,6 +95,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
                       openal
                       ssl
                       crypto
+                      fmodpp
+                      fmodstudio_stub
                       stdc++
                       vitaGL
                       vitashark

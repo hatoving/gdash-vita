@@ -11,7 +11,9 @@
  */
 
 #include "patch.h"
+
 #include "openssl_patch.h"
+
 #include "utils/logger.h"
 
 #include <kubridge.h>

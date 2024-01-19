@@ -61,7 +61,7 @@
 #include "reimpl/pthr.h"
 #include "reimpl/sys.h"
 
-#include "fmod.h"
+#include "fmod_symbols.h"
 
 extern void * _ZNSt9exceptionD2Ev;
 extern void * _ZSt17__throw_bad_allocv;
@@ -131,10 +131,41 @@ extern const short *BIONIC_toupper_tab_;
 
 static FILE __sF_fake[3];
 
+int FMOD_ReturnOK() {
+    return 0x00;
+}
+
+char* load_file(char const* path)
+{
+    FILE* file = fopen(path, "rb");
+    if (!file) {
+        fprintf(stderr, "Unable to open file %s\n", path);
+        return NULL;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char* source = (char*)malloc(length + 1);
+    if (!source) {
+        fprintf(stderr, "Memory allocation error\n");
+        fclose(file);
+        return NULL;
+    }
+
+    fread(source, 1, length, file);
+    fclose(file);
+
+    source[length] = '\0'; // Null-terminate the string
+    return source;
+}
+
 // used this to print out the shaders i need in case it fucks up anything
-/*void glShaderSourceHookNew(GLuint shader, GLsizei count, const GLchar **string, const GLint *length) {
+void glShaderSourceHookNew(GLuint shader, GLsizei count, const GLchar **string, const GLint *length) {
     sceClibPrintf("//// SHADER SOURCE ////\n");
-    size_t totalLength = 0;
+    sceClibPrintf("//// SHADER HANDLE %i ////", shader);
+    /*size_t totalLength = 0;
     for (int i = 0; i < count; ++i) {
         totalLength += length ? length[i] : strlen(string[i]);
     }
@@ -156,11 +187,16 @@ static FILE __sF_fake[3];
 
     // Null-terminate the result
     result[offset] = '\0';
-    sceClibPrintf("%s", result);
+    sceClibPrintf("%s", result);*/
     sceClibPrintf("\n//// SHADER SOURCE END ////\n");
-
-    glShaderSource(shader, count, string, length);
-}*/
+    if(shader == 20) {
+        char* shader_text = load_file("ux0:data/gdash/shader.txt");
+        glShaderSource(shader, 1, &shader_text, NULL);
+    }
+    else {
+        glShaderSource(shader, count, string, length);
+    }
+}
 
 int __atomic_dec(volatile int *ptr) {
     return __sync_fetch_and_sub (ptr, 1);
@@ -643,7 +679,7 @@ so_default_dynlib default_dynlib[] = {
 #ifdef USE_CG_SHADERS
         { "glShaderSource", (uintptr_t)&glShaderSourceHook },
 #else
-        { "glShaderSource", (uintptr_t)&glShaderSource },
+        { "glShaderSource", (uintptr_t)&glShaderSourceHookNew },
 #endif
         { "glStencilFunc", (uintptr_t)&glStencilFunc },
         { "glStencilFuncSeparate", (uintptr_t)&glStencilFuncSeparate },
@@ -972,70 +1008,69 @@ so_default_dynlib default_dynlib[] = {
         { "inet_pton", (uintptr_t)&inet_pton },
 
         // FMOD
-        {"_ZN4FMOD3DSP15getMeteringInfoEP22FMOD_DSP_METERING_INFOS2_", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl11getUserDataEPPv", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl6getDSPEiPPNS_3DSPE", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD3DSP17setParameterFloatEif", (uintptr_t)&FMOD_ReturnOK},
-        {"FMOD_System_Create", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System10getVersionEPj", (uintptr_t)&FMOD_ReturnOK},
-        {"FMOD_Debug_Initialize", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System19getStreamBufferSizeEPjS1_", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System16setDSPBufferSizeEji", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System16getDSPBufferSizeEPjPi", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System17getSoftwareFormatEPiP16FMOD_SPEAKERMODES1_", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System17setSoftwareFormatEi16FMOD_SPEAKERMODEi", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System4initEijPv", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System18createChannelGroupEPKcPPNS_12ChannelGroupE", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl13setVolumeRampEb", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD3DSP18setMeteringEnabledEbb", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD12ChannelGroup8addGroupEPS0_bPPNS_13DSPConnectionE", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System15createDSPByTypeE13FMOD_DSP_TYPEPPNS_3DSPE", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD3DSP16setParameterBoolEib", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl6addDSPEiPNS_3DSPE", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System11mixerResumeEv", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System6updateEv", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System12mixerSuspendEv", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl9setPausedEb", (uintptr_t)&FMOD_ReturnOK},
-        {"FMOD_Channel_GetFadePoints", (uintptr_t)&FMOD_ReturnOK},
-        {"FMOD_Channel_GetDSPClock", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl11getDSPClockEPyS1_", (uintptr_t)&FMOD_ReturnOK},
-        {"FMOD_Channel_RemoveFadePoints", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl9setVolumeEf", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD5Sound12getOpenStateEP14FMOD_OPENSTATEPjPbS4_", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System12createStreamEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD5Sound12setLoopCountEi", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD5Sound7releaseEv", (uintptr_t)&FMOD_ReturnOK},
-        {"FMOD_Memory_GetStats", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System11getCPUUsageEP14FMOD_CPU_USAGE", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl4stopEv", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System5closeEv", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System7releaseEv", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD12ChannelGroup7releaseEv", (uintptr_t)&FMOD_ReturnOK},
-        {"FMOD_System_LockDSP", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD7Channel13getLoopPointsEPjjS1_j", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD7Channel11getPositionEPjj", (uintptr_t)&FMOD_ReturnOK},
-        {"FMOD_Channel_GetDelay", (uintptr_t)&FMOD_ReturnOK},
-        {"FMOD_System_UnlockDSP", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl11setUserDataEPv", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl9getVolumeEPf", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl8getPitchEPf", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD7Channel11setPositionEjj", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD7Channel15getCurrentSoundEPPNS_5SoundE", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD5Sound9getLengthEPjj", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl8setPitchEf", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl9getPausedEPb", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl12addFadePointEyf", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD7Channel12setLoopCountEi", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl8setDelayEyyb", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD7Channel13setLoopPointsEjjjj", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System9playSoundEPNS_5SoundEPNS_12ChannelGroupEbPPNS_7ChannelE", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD14ChannelControl11setCallbackEPF11FMOD_RESULTP19FMOD_CHANNELCONTROL24FMOD_CHANNELCONTROL_TYPE33FMOD_CHANNELCONTROL_CALLBACK_TYPEPvS6_E", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD12ChannelGroup14getNumChannelsEPi", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD12ChannelGroup10getChannelEiPPNS_7ChannelE", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System11createSoundEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System7lockDSPEv", (uintptr_t)&FMOD_ReturnOK},
-        {"_ZN4FMOD6System9unlockDSPEv", (uintptr_t)&FMOD_ReturnOK},
-
+        {"_ZN4FMOD3DSP15getMeteringInfoEP22FMOD_DSP_METERING_INFOS2_", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD3DSP15getMeteringInfoEP22FMOD_DSP_METERING_INFOS2_},
+        {"_ZN4FMOD14ChannelControl11getUserDataEPPv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl11getUserDataEPPv},
+        {"_ZN4FMOD14ChannelControl6getDSPEiPPNS_3DSPE", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl6getDSPEiPPNS_3DSPE},
+        {"_ZN4FMOD3DSP17setParameterFloatEif", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD3DSP17setParameterFloatEif},
+        {"FMOD_System_Create", (uintptr_t)&ret0},//(uintptr_t)&FMOD_System_Create},
+        {"_ZN4FMOD6System10getVersionEPj", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System10getVersionEPj},
+        {"FMOD_Debug_Initialize", (uintptr_t)&ret0},//(uintptr_t)&FMOD_Debug_Initialize},
+        {"_ZN4FMOD6System19getStreamBufferSizeEPjS1_", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System19getStreamBufferSizeEPjS1_},
+        {"_ZN4FMOD6System16setDSPBufferSizeEji", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System16setDSPBufferSizeEji},
+        {"_ZN4FMOD6System16getDSPBufferSizeEPjPi", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System16getDSPBufferSizeEPjPi},
+        {"_ZN4FMOD6System17getSoftwareFormatEPiP16FMOD_SPEAKERMODES1_", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System17getSoftwareFormatEPiP16FMOD_SPEAKERMODES1_},
+        {"_ZN4FMOD6System17setSoftwareFormatEi16FMOD_SPEAKERMODEi", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System17setSoftwareFormatEi16FMOD_SPEAKERMODEi},
+        {"_ZN4FMOD6System4initEijPv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System4initEijPv},
+        {"_ZN4FMOD6System18createChannelGroupEPKcPPNS_12ChannelGroupE", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System18createChannelGroupEPKcPPNS_12ChannelGroupE},
+        {"_ZN4FMOD14ChannelControl13setVolumeRampEb", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl13setVolumeRampEb},
+        {"_ZN4FMOD3DSP18setMeteringEnabledEbb", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD3DSP18setMeteringEnabledEbb},
+        {"_ZN4FMOD12ChannelGroup8addGroupEPS0_bPPNS_13DSPConnectionE", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD12ChannelGroup8addGroupEPS0_bPPNS_13DSPConnectionE},
+        {"_ZN4FMOD6System15createDSPByTypeE13FMOD_DSP_TYPEPPNS_3DSPE", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System15createDSPByTypeE13FMOD_DSP_TYPEPPNS_3DSPE},
+        {"_ZN4FMOD3DSP16setParameterBoolEib", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD3DSP16setParameterBoolEib},
+        {"_ZN4FMOD14ChannelControl6addDSPEiPNS_3DSPE", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl6addDSPEiPNS_3DSPE},
+        {"_ZN4FMOD6System11mixerResumeEv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System11mixerResumeEv},
+        {"_ZN4FMOD6System6updateEv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System6updateEv},
+        {"_ZN4FMOD6System12mixerSuspendEv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System12mixerSuspendEv},
+        {"_ZN4FMOD14ChannelControl9setPausedEb", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl9setPausedEb},
+        {"FMOD_Channel_GetFadePoints", (uintptr_t)&ret0},//(uintptr_t)&FMOD_Channel_GetFadePoints},
+        {"FMOD_Channel_GetDSPClock", (uintptr_t)&ret0},//(uintptr_t)&FMOD_Channel_GetDSPClock},
+        {"_ZN4FMOD14ChannelControl11getDSPClockEPyS1_", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl11getDSPClockEPyS1_},
+        {"FMOD_Channel_RemoveFadePoints", (uintptr_t)&ret0},//(uintptr_t)&FMOD_Channel_RemoveFadePoints},
+        {"_ZN4FMOD14ChannelControl9setVolumeEf", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl9setVolumeEf},
+        {"_ZN4FMOD5Sound12getOpenStateEP14FMOD_OPENSTATEPjPbS4_", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD5Sound12getOpenStateEP14FMOD_OPENSTATEPjPbS4_},
+        {"_ZN4FMOD6System12createStreamEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System12createStreamEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE},
+        {"_ZN4FMOD5Sound12setLoopCountEi", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD5Sound12setLoopCountEi},
+        {"_ZN4FMOD5Sound7releaseEv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD5Sound7releaseEv},
+        {"FMOD_Memory_GetStats", (uintptr_t)&ret0},//(uintptr_t)&FMOD_Memory_GetStats},
+        {"_ZN4FMOD6System11getCPUUsageEP14FMOD_CPU_USAGE", (uintptr_t)&ret0},//(uintptr_t)&FMOD_ReturnOK},
+        {"_ZN4FMOD14ChannelControl4stopEv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl4stopEv},
+        {"_ZN4FMOD6System5closeEv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System5closeEv},
+        {"_ZN4FMOD6System7releaseEv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System7releaseEv},
+        {"_ZN4FMOD12ChannelGroup7releaseEv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD12ChannelGroup7releaseEv},
+        {"FMOD_System_LockDSP", (uintptr_t)&ret0},//(uintptr_t)&FMOD_System_LockDSP},
+        {"_ZN4FMOD7Channel13getLoopPointsEPjjS1_j", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD7Channel13getLoopPointsEPjjS1_j},
+        {"_ZN4FMOD7Channel11getPositionEPjj", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD7Channel11getPositionEPjj},
+        {"FMOD_Channel_GetDelay", (uintptr_t)&ret0},//(uintptr_t)&FMOD_Channel_GetDelay},
+        {"FMOD_System_UnlockDSP", (uintptr_t)&ret0},//(uintptr_t)&FMOD_System_UnlockDSP},
+        {"_ZN4FMOD14ChannelControl11setUserDataEPv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl11setUserDataEPv},
+        {"_ZN4FMOD14ChannelControl9getVolumeEPf", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl9getVolumeEPf},
+        {"_ZN4FMOD14ChannelControl8getPitchEPf", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl8getPitchEPf},
+        {"_ZN4FMOD7Channel11setPositionEjj", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD7Channel11setPositionEjj},
+        {"_ZN4FMOD7Channel15getCurrentSoundEPPNS_5SoundE", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD7Channel15getCurrentSoundEPPNS_5SoundE},
+        {"_ZN4FMOD5Sound9getLengthEPjj", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD5Sound9getLengthEPjj},
+        {"_ZN4FMOD14ChannelControl8setPitchEf", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl8setPitchEf},
+        {"_ZN4FMOD14ChannelControl9getPausedEPb", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl9getPausedEPb},
+        {"_ZN4FMOD14ChannelControl12addFadePointEyf", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl12addFadePointEyf},
+        {"_ZN4FMOD7Channel12setLoopCountEi", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD7Channel12setLoopCountEi},
+        {"_ZN4FMOD14ChannelControl8setDelayEyyb", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl8setDelayEyyb},
+        {"_ZN4FMOD7Channel13setLoopPointsEjjjj", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD7Channel13setLoopPointsEjjjj},
+        {"_ZN4FMOD6System9playSoundEPNS_5SoundEPNS_12ChannelGroupEbPPNS_7ChannelE", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System9playSoundEPNS_5SoundEPNS_12ChannelGroupEbPPNS_7ChannelE},
+        {"_ZN4FMOD14ChannelControl11setCallbackEPF11FMOD_RESULTP19FMOD_CHANNELCONTROL24FMOD_CHANNELCONTROL_TYPE33FMOD_CHANNELCONTROL_CALLBACK_TYPEPvS6_E", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD14ChannelControl11setCallbackEPF11FMOD_RESULTP19FMOD_CHANNELCONTROL24FMOD_CHANNELCONTROL_TYPE33FMOD_CHANNELCONTROL_CALLBACK_TYPEPvS6_E},
+        {"_ZN4FMOD12ChannelGroup14getNumChannelsEPi", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD12ChannelGroup14getNumChannelsEPi},
+        {"_ZN4FMOD12ChannelGroup10getChannelEiPPNS_7ChannelE", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD12ChannelGroup10getChannelEiPPNS_7ChannelE},
+        {"_ZN4FMOD6System11createSoundEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System11createSoundEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE},
+        {"_ZN4FMOD6System7lockDSPEv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System7lockDSPEv},
+        {"_ZN4FMOD6System9unlockDSPEv", (uintptr_t)&ret0},//(uintptr_t)&_ZN4FMOD6System9unlockDSPEv},
 };
 
 void resolve_imports(so_module* mod) {

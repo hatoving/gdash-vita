@@ -7,6 +7,14 @@
         "crypt.h": "c",
         "so_util.h": "c",
         "crypto.h": "c",
-        "evp.h": "c"
+        "evp.h": "c",
+        "fmod_common.h": "c",
+        "fmod.h": "c",
+        "fmod_dsp.h": "c",
+        "fmod_output.h": "c",
+        "fmod_codec.h": "c",
+        "fmod.hpp": "c",
+        "fmod_patch.h": "c",
+        "cstring": "c"
     }
 }
