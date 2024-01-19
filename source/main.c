@@ -35,10 +35,7 @@ int sceLibcHeapSize = 24 * 1024 * 1024;
 
 so_module so_mod;
 
-int main() {
-    sceTouchSetSamplingState(SCE_TOUCH_PORT_FRONT, SCE_TOUCH_SAMPLING_STATE_START);
-    soloader_init_all();
-
+void fmod_init() {
     sceSysmoduleLoadModule(SCE_SYSMODULE_NET);
     int ret = sceNetShowNetstat();
     SceNetInitParam initparam;
@@ -53,12 +50,23 @@ int main() {
     sceClibPrintf("sceKernelLoadStartModule %x\n", sceKernelLoadStartModule("ux0:data/libfios2.suprx", 0, NULL, 0, NULL, NULL));
     sceClibPrintf("sceKernelLoadStartModule %x\n", sceKernelLoadStartModule("ux0:data/libc.suprx", 0, NULL, 0, NULL, NULL));
     sceClibPrintf("sceKernelLoadStartModule %x\n", sceKernelLoadStartModule("ur0:data/libfmodstudio.suprx", 0, NULL, 0, NULL, NULL));
+}
+
+int main() {
+    sceTouchSetSamplingState(SCE_TOUCH_PORT_FRONT, SCE_TOUCH_SAMPLING_STATE_START);
+
+    soloader_init_all();
+    fmod_init();
 
     int (* JNI_OnLoad)(void *jvm) = (void *)so_symbol(&so_mod, "JNI_OnLoad");
-    int (* Java_org_cocos2dx_lib_Cocos2dxHelper_nativeSetApkPath)(JNIEnv *jni, void *unk, jstring apk_path) = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxHelper_nativeSetApkPath");
+    //_ZN7cocos2d9extension13AssetsManager14setStoragePathEPKc
+    int (* Java_org_cocos2dx_lib_Cocos2dxHelper_nativeSetApkPath)(JNIEnv *jni, void *unk, jstring apk_path) 
+        = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxHelper_nativeSetApkPath");
 
-    int (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInit)(JNIEnv *jni, void* unk, jint w, jint h) = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInit");
-    int (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeRender)(void) = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeRender");
+    int (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInit)(JNIEnv *jni, void* unk, jint w, jint h) 
+        = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInit");
+    int (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeRender)(void) 
+        = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeRender");
 
     void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin)(JNIEnv * env, jobject thiz, jint id, jfloat x, jfloat y) 
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin");
@@ -76,6 +84,7 @@ int main() {
 
     int lastX[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
     int lastY[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
+    int ids[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
     while (1) {
         SceTouchData touch;
@@ -84,16 +93,20 @@ int main() {
             if (i < touch.reportNum) {
                 int x = (int)((float)touch.report[i].x * (float)960.0f / 1920.0f);
                 int y = (int)((float)touch.report[i].y * (float)544.0f / 1088.0f);
+                int id = i;
 
                 if (lastX[i] == -1 || lastY[i] == -1) {
                     //Java_com_twodboy_worldofgoo_DemoRenderer_nativeTouchEvent(&jni, 0, TOUCH_START, x, y, i);
                     Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin(&jni, NULL, i, x, y);
                 }
-                else if (lastX[i] != x || lastY[i] != y)
-                    Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove(&jni, NULL, &i, lastX, lastY);
 
                 lastX[i] = x;
                 lastY[i] = y;
+                ids[i] = id;
+
+                if (lastX[i] != x || lastY[i] != y)
+                    Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove(&jni, NULL, ids, lastX, lastY);
+
             } else {
                 if (lastX[i] != -1 || lastY[i] != -1) {
                     //Java_com_twodboy_worldofgoo_DemoRenderer_nativeTouchEvent(fake_env, 0, TOUCH_END, lastX[i], lastY[i], i);

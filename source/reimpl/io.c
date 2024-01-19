@@ -40,14 +40,19 @@ FILE *fopen_soloader(char *fname, char *mode) {
         return fopen_soloader("app0:/meminfo", mode);
     }
 
+    char * fname_real = strdup(fname);
+    str_replace(fname_real, "/data/data/com.robtopx.geometryjump/", DATA_PATH);
+
     #ifdef USE_SCELIBC_IO
-        FILE* ret = sceLibcBridge_fopen(fname, mode);
+        FILE* ret = sceLibcBridge_fopen(fname_real, mode);
     #else
-        FILE* ret = fopen(fname, mode);
+        FILE* ret = fopen(fname_real, mode);
     #endif
 
-    logv_debug("[io] fopen(%s, %s): 0x%x", fname, mode, ret);
+    logv_debug("[io] fopen(%s, %s): 0x%x", fname_real, mode, ret);
 
+    free(fname_real);
+    
     return ret;
 }
 

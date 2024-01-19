@@ -13,8 +13,10 @@
 #include "patch.h"
 
 #include "openssl_patch.h"
+#include "fmod_symbols.h"
 
 #include "utils/logger.h"
+#include "utils/utils.h"
 
 #include <kubridge.h>
 #include <vitaGL.h>
@@ -24,5 +26,4 @@ extern so_module so_mod;
 
 void so_patch(void) {
     patch_openssl();
-    //hook_addr(so_symbol(&so_mod, "_ZN4FMOD14ChannelControl9setVolumeEf"), (uintptr_t)FMOD_ChannelControl_SetVolume); //dummy func for now
 }

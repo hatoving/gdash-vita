@@ -95,9 +95,9 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
                       openal
                       ssl
                       crypto
+                      stdc++
                       fmodpp
                       fmodstudio_stub
-                      stdc++
                       vitaGL
                       vitashark
                       SceShaccCgExt
