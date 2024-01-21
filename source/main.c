@@ -27,6 +27,10 @@
 #include <psp2/kernel/processmgr.h>
 #include <sched.h>
 
+#ifdef USE_FMOD
+    #include <fmod/fmod.h>
+#endif
+
 int _newlib_heap_size_user = 256 * 1024 * 1024;
 
 #ifdef USE_SCELIBC_IO
@@ -54,9 +58,11 @@ void fmod_init() {
 
 int main() {
     sceTouchSetSamplingState(SCE_TOUCH_PORT_FRONT, SCE_TOUCH_SAMPLING_STATE_START);
-
     soloader_init_all();
-    fmod_init();
+
+    #ifdef USE_FMOD
+        fmod_init();
+    #endif
 
     int (* JNI_OnLoad)(void *jvm) = (void *)so_symbol(&so_mod, "JNI_OnLoad");
     //_ZN7cocos2d9extension13AssetsManager14setStoragePathEPKc
@@ -70,7 +76,7 @@ int main() {
 
     void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin)(JNIEnv * env, jobject thiz, jint id, jfloat x, jfloat y) 
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin");
-    //jboolean (* Cocos2D_KeyDown)(JNIEnv *jni, jobject thiz, jint keyCode) = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown");
+    //jboolean (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown)(JNIEnv * env, jobject thiz, jint keyCode) = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown");
     void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove)(JNIEnv * env, jobject thiz, jintArray ids, jfloatArray xs, jfloatArray ys)
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove");
     void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd)(JNIEnv * env, jobject thiz, jint id, jfloat x, jfloat y)

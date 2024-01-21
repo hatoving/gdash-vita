@@ -28,6 +28,11 @@ set(DATA_PATH "ux0:data/gdash/" CACHE STRING "Path to data (with trailing /)")
 set(APK_PATH "${DATA_PATH}GeometryDash.apk" CACHE STRING "Path to data (with trailing /)")
 set(SO_PATH "${DATA_PATH}libcocos2dcpp.so" CACHE STRING "Path to .so")
 
+option(USE_FMOD "Use FMOD library (doesn't do anything right now)" OFF)
+if (USE_FMOD)
+  add_definitions(-DUSE_FMOD)
+endif()
+
 option(USE_SCELIBC_IO "Use SceLibcBridge for IO and some other std functions" ON)
 if (USE_SCELIBC_IO)
   add_definitions(-DUSE_SCELIBC_IO)
@@ -96,8 +101,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
                       ssl
                       crypto
                       stdc++
-                      fmodpp
-                      fmodstudio_stub
                       vitaGL
                       vitashark
                       SceShaccCgExt
@@ -126,6 +129,14 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
                       SceTouch_stub
                       SceVshBridge_stub
                       )
+
+if(USE_FMOD)
+    target_link_libraries(${CMAKE_PROJECT_NAME}
+        -Wl,--whole-archive pthread -Wl,--no-whole-archive
+        fmodpp
+        fmodstudio
+    )
+endif()
 
 vita_create_self(eboot.bin ${CMAKE_PROJECT_NAME} UNSAFE NOASLR)
 vita_create_vpk(${VITA_VPKNAME}.vpk ${VITA_TITLEID} eboot.bin

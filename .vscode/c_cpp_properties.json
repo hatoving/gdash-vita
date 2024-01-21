@@ -15,7 +15,8 @@
             "name": "VitaSDk",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/local/vitasdk/arm-vita-eabi/include"
+                "/usr/local/vitasdk/arm-vita-eabi/include",
+                "${workspaceFolder}/lib"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

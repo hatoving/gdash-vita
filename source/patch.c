@@ -26,4 +26,5 @@ extern so_module so_mod;
 
 void so_patch(void) {
     patch_openssl();
+    //hook_addr(so_symbol(&so_mod, "_ZN7cocos2d5CCLogEPKcz"), (uintptr_t)&_ZN7cocos2d5CCLogEPKcz);
 }
