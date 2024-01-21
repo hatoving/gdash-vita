@@ -42,8 +42,9 @@
         sprintf(fname_real, "%s%s", ASSETS_PATH, &name_or_data[22]);
 
         int ret = __real_FMOD_System_CreateSound(system, fname_real, mode, exinfo, sound);
-        logv_debug("FMOD SOUND RETURN!!::: %i", ret);
-        logv_debug("FMOD SOUND CREATION!!::: %s", name_or_data);
+        
+        //logv_debug("FMOD SOUND RETURN!!::: %i", ret);
+        //logv_debug("FMOD SOUND CREATION!!::: %s", fname_real);
 
         return ret;
     }
@@ -53,8 +54,9 @@
         sprintf(fname_real, "%s%s", ASSETS_PATH, &name_or_data[22]);
 
         int ret = __real_FMOD_System_CreateStream(system, fname_real, mode, exinfo, sound);
-        logv_debug("FMOD STREAM RETURN!!::: %i", ret);
-        logv_debug("FMOD STREAM CREATION!!::: %s", name_or_data);
+
+        //logv_debug("FMOD STREAM RETURN!!::: %i", ret);
+        //logv_debug("FMOD STREAM CREATION!!::: %s", fname_real);
 
         return ret;
     }

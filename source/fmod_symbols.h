@@ -60,7 +60,7 @@
     extern void* _ZN4FMOD7Channel12setLoopCountEi;
     extern void* _ZN4FMOD14ChannelControl8setDelayEyyb;
     extern void* _ZN4FMOD7Channel13setLoopPointsEjjjj;
-    extern void* _ZN4FMOD6System9playSoundEPNS_5SoundEPNS_12ChannelGroupEbPPNS_7ChannelE;
+    extern int _ZN4FMOD6System9playSoundEPNS_5SoundEPNS_12ChannelGroupEbPPNS_7ChannelE(void* system, void* sound, void* channel_group, bool paused, void **channel);
     extern void* _ZN4FMOD14ChannelControl11setCallbackEPF11FMOD_RESULTP19FMOD_CHANNELCONTROL24FMOD_CHANNELCONTROL_TYPE33FMOD_CHANNELCONTROL_CALLBACK_TYPEPvS6_E;
     extern void* _ZN4FMOD12ChannelGroup14getNumChannelsEPi;
     extern void* _ZN4FMOD12ChannelGroup10getChannelEiPPNS_7ChannelE;

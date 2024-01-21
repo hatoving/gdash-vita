@@ -22,15 +22,14 @@
 #include <vitaGL.h>
 #include <so_util/so_util.h>
 
-#ifdef USE_FMOD
-
 extern so_module so_mod;
-
 int* (* _ZN15FMODAudioEngine21getActiveMusicChannelEi)(void* this, int a2);
+
+#ifdef USE_FMOD
 
 int FMODAudioEngine_isMusicPlaying_soloader(void *this, int a2) {
     void* channel = _ZN15FMODAudioEngine21getActiveMusicChannelEi(this, a2);
-    int ret = 0;
+    int ret = 1;
     if (channel) {
         _ZN4FMOD14ChannelControl9getPausedEPb(channel, &ret);
     }

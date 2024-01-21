@@ -96,42 +96,80 @@ target_include_directories(${CMAKE_PROJECT_NAME}
                            PUBLIC ${CMAKE_SOURCE_DIR}/source
                            )
 
-target_link_libraries(${CMAKE_PROJECT_NAME}
-                      -Wl,--whole-archive pthread -Wl,--no-whole-archive -Wl,--wrap,FMOD_System_CreateSound,--wrap,FMOD_System_CreateStream
-                      openal
-                      ssl
-                      crypto
-                      stdc++
-                      vitaGL
-                      vitashark
-                      SceShaccCgExt
-                      taihen_stub
-                      SceShaccCg_stub
-                      fmodpp
-                      fmodstudio_stub
-                      z
-                      m
-                      ScePgf_stub
-                      mathneon
-                      kubridge_stub
-                      SceHid_stub
-                      SceTouch_stub
-                      SceMotion_stub
-                      SceAppMgr_stub
-                      SceAppUtil_stub
-                      SceAudio_stub
-                      SceAudioIn_stub
-                      SceCommonDialog_stub
-                      SceDisplay_stub
-                      SceKernelDmacMgr_stub
-                      SceFios2_stub
-                      ${CMAKE_BINARY_DIR}/lib/libc_bridge/stubs/libSceLibcBridge_stub.a
-                      SceCtrl_stub
-                      SceGxm_stub
-                      ScePower_stub
-                      SceTouch_stub
-                      SceVshBridge_stub
+if(USE_FMOD)
+    target_link_libraries(${CMAKE_PROJECT_NAME}
+                          -Wl,--whole-archive pthread -Wl,--no-whole-archive -Wl,-q,--wrap,FMOD_System_CreateSound,--wrap,FMOD_System_CreateStream
+                          openal
+                          ssl
+                          crypto
+                          stdc++
+                          vitaGL
+                          vitashark
+                          SceShaccCgExt
+                          taihen_stub
+                          SceShaccCg_stub
+                          fmodpp
+                          fmodstudio_stub
+                          z
+                          m
+                          ScePgf_stub
+                          mathneon
+                          kubridge_stub
+                          SceHid_stub
+                          SceTouch_stub
+                          SceMotion_stub
+                          SceAppMgr_stub
+                          SceAppUtil_stub
+                          SceAudio_stub
+                          SceAudioIn_stub
+                          SceCommonDialog_stub
+                          SceDisplay_stub
+                          SceKernelDmacMgr_stub
+                          SceFios2_stub
+                          ${CMAKE_BINARY_DIR}/lib/libc_bridge/stubs/libSceLibcBridge_stub.a
+                          SceCtrl_stub
+                          SceGxm_stub
+                          ScePower_stub
+                          SceTouch_stub
+                          SceVshBridge_stub
                       )
+else()
+    target_link_libraries(${CMAKE_PROJECT_NAME}
+                          -Wl,--whole-archive pthread -Wl,--no-whole-archive
+                          openal
+                          ssl
+                          crypto
+                          stdc++
+                          vitaGL
+                          vitashark
+                          SceShaccCgExt
+                          taihen_stub
+                          SceShaccCg_stub
+                          z
+                          m
+                          ScePgf_stub
+                          mathneon
+                          kubridge_stub
+                          SceHid_stub
+                          SceTouch_stub
+                          SceMotion_stub
+                          SceAppMgr_stub
+                          SceAppUtil_stub
+                          SceAudio_stub
+                          SceAudioIn_stub
+                          SceCommonDialog_stub
+                          SceDisplay_stub
+                          SceKernelDmacMgr_stub
+                          SceFios2_stub
+                          ${CMAKE_BINARY_DIR}/lib/libc_bridge/stubs/libSceLibcBridge_stub.a
+                          SceCtrl_stub
+                          SceGxm_stub
+                          ScePower_stub
+                          SceTouch_stub
+                          SceVshBridge_stub
+                      )
+endif()
+
 
 vita_create_self(eboot.bin ${CMAKE_PROJECT_NAME} UNSAFE NOASLR)
 vita_create_vpk(${VITA_VPKNAME}.vpk ${VITA_TITLEID} eboot.bin
