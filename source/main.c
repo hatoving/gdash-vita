@@ -12,6 +12,8 @@
  */
 
 #include "utils/init.h"
+#include "utils/dialog.h"
+#include "utils/logger.h"
 #include "utils/glutil.h"
 #include "utils/settings.h"
 
@@ -26,9 +28,36 @@
 #include <so_util/so_util.h>
 #include <psp2/kernel/processmgr.h>
 #include <sched.h>
+#include <stdio.h>
+#include <sys/stat.h>
 
 #ifdef USE_FMOD
     #include <fmod/fmod.h>
+
+    extern FMOD_RESULT F_API __real_FMOD_System_CreateSound(FMOD_SYSTEM *system, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound);
+    extern FMOD_RESULT F_API __real_FMOD_System_CreateStream(FMOD_SYSTEM *system, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound);
+
+    FMOD_RESULT F_API __wrap_FMOD_System_CreateSound(FMOD_SYSTEM *system, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound) {
+        char fname_real[256];
+        sprintf(fname_real, "%s%s", ASSETS_PATH, &name_or_data[22]);
+
+        int ret = __real_FMOD_System_CreateSound(system, fname_real, mode, exinfo, sound);
+        logv_debug("FMOD SOUND RETURN!!::: %i", ret);
+        logv_debug("FMOD SOUND CREATION!!::: %s", name_or_data);
+
+        return ret;
+    }
+
+    FMOD_RESULT F_API __wrap_FMOD_System_CreateStream(FMOD_SYSTEM *system, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound) {
+        char fname_real[256];
+        sprintf(fname_real, "%s%s", ASSETS_PATH, &name_or_data[22]);
+
+        int ret = __real_FMOD_System_CreateStream(system, fname_real, mode, exinfo, sound);
+        logv_debug("FMOD STREAM RETURN!!::: %i", ret);
+        logv_debug("FMOD STREAM CREATION!!::: %s", name_or_data);
+
+        return ret;
+    }
 #endif
 
 int _newlib_heap_size_user = 256 * 1024 * 1024;
@@ -56,6 +85,38 @@ void fmod_init() {
     sceClibPrintf("sceKernelLoadStartModule %x\n", sceKernelLoadStartModule("ur0:data/libfmodstudio.suprx", 0, NULL, 0, NULL, NULL));
 }
 
+// For some reason, Geometry Dash doesn't create the files necessary at boot
+// to actually store your level/save data. This functions takes responsibility
+// of that.
+void save_files_init() {
+    char* file_paths[] = {
+        "ux0:data/gdash/CCGameManager.dat",
+        "ux0:data/gdash/CCGameManager2.dat",
+        "ux0:data/gdash/CCGameManager.dat.bak",
+        "ux0:data/gdash/CCLocalLevels.dat",
+        "ux0:data/gdash/CCLocalLevels.dat.bak",
+        "ux0:data/gdash/CCLocalLevels2.dat",
+    };
+
+    for (int i = 0; i < 6; i++) {
+        FILE* f = fopen(file_paths[i], "r");
+
+        // if file doesn't exist, then create it
+        // so that the game can open it
+        if (f == NULL) {
+            logv_debug("File \"%s\" doesn't exist. Creating...", file_paths[i]);
+
+            FILE* nf = fopen(file_paths[i], "w");
+            if (nf != NULL) {
+                logv_debug("File \"%s\" successfully created", file_paths[i]);
+                fclose(nf);
+            }
+        }
+
+        fclose(f);
+    }
+}
+
 int main() {
     sceTouchSetSamplingState(SCE_TOUCH_PORT_FRONT, SCE_TOUCH_SAMPLING_STATE_START);
     soloader_init_all();
@@ -63,6 +124,8 @@ int main() {
     #ifdef USE_FMOD
         fmod_init();
     #endif
+
+    save_files_init();
 
     int (* JNI_OnLoad)(void *jvm) = (void *)so_symbol(&so_mod, "JNI_OnLoad");
     //_ZN7cocos2d9extension13AssetsManager14setStoragePathEPKc
@@ -82,6 +145,9 @@ int main() {
     void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd)(JNIEnv * env, jobject thiz, jint id, jfloat x, jfloat y)
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd");
 
+    int (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInsertText)(JNIEnv* env, jobject thiz, jstring text)
+        = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInsertText");
+
     JNI_OnLoad(&jvm);
     Java_org_cocos2dx_lib_Cocos2dxHelper_nativeSetApkPath(&jni, NULL, APK_PATH);
 
@@ -90,7 +156,6 @@ int main() {
 
     int lastX[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
     int lastY[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
-    int ids[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
     while (1) {
         SceTouchData touch;
@@ -105,13 +170,11 @@ int main() {
                     //Java_com_twodboy_worldofgoo_DemoRenderer_nativeTouchEvent(&jni, 0, TOUCH_START, x, y, i);
                     Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin(&jni, NULL, i, x, y);
                 }
+                else
+                    Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove(&jni, NULL, (int*)i, (int*)x, (int*)y);
 
                 lastX[i] = x;
                 lastY[i] = y;
-                ids[i] = id;
-
-                if (lastX[i] != x || lastY[i] != y)
-                    Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove(&jni, NULL, ids, lastX, lastY);
 
             } else {
                 if (lastX[i] != -1 || lastY[i] != -1) {

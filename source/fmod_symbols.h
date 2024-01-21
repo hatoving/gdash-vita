@@ -1,6 +1,8 @@
 #ifndef FMOD_SYMBOLS_H
 #define FMOD_SYMBOLS_H
 
+#include <stdbool.h>
+
 #ifdef USE_FMOD
     extern void* _ZN4FMOD3DSP15getMeteringInfoEP22FMOD_DSP_METERING_INFOS2_;
     extern void* _ZN4FMOD14ChannelControl11getUserDataEPPv;
@@ -32,7 +34,7 @@
     extern void* FMOD_Channel_RemoveFadePoints;
     extern void* _ZN4FMOD14ChannelControl9setVolumeEf;
     extern void* _ZN4FMOD5Sound12getOpenStateEP14FMOD_OPENSTATEPjPbS4_;
-    extern void* _ZN4FMOD6System12createStreamEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE;
+    extern int _ZN4FMOD6System12createStreamEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE(void *this, const char *fname, int mode, void *exinfo, int **sound);
     extern void* _ZN4FMOD5Sound12setLoopCountEi;
     extern void* _ZN4FMOD5Sound7releaseEv;
     extern void* FMOD_Memory_GetStats;
@@ -53,7 +55,7 @@
     extern void* _ZN4FMOD7Channel15getCurrentSoundEPPNS_5SoundE;
     extern void* _ZN4FMOD5Sound9getLengthEPjj;
     extern void* _ZN4FMOD14ChannelControl8setPitchEf;
-    extern void* _ZN4FMOD14ChannelControl9getPausedEPb;
+    extern int _ZN4FMOD14ChannelControl9getPausedEPb(void* channel, bool* paused);
     extern void* _ZN4FMOD14ChannelControl12addFadePointEyf;
     extern void* _ZN4FMOD7Channel12setLoopCountEi;
     extern void* _ZN4FMOD14ChannelControl8setDelayEyyb;
@@ -62,7 +64,7 @@
     extern void* _ZN4FMOD14ChannelControl11setCallbackEPF11FMOD_RESULTP19FMOD_CHANNELCONTROL24FMOD_CHANNELCONTROL_TYPE33FMOD_CHANNELCONTROL_CALLBACK_TYPEPvS6_E;
     extern void* _ZN4FMOD12ChannelGroup14getNumChannelsEPi;
     extern void* _ZN4FMOD12ChannelGroup10getChannelEiPPNS_7ChannelE;
-    extern void* _ZN4FMOD6System11createSoundEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE;
+    extern int _ZN4FMOD6System11createSoundEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE(void *this, const char *fname, int mode, void *exinfo, int** sound);
     extern void* _ZN4FMOD6System7lockDSPEv;
     extern void* _ZN4FMOD6System9unlockDSPEv;
 #endif

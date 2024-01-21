@@ -15,6 +15,11 @@
         "fmod_codec.h": "c",
         "fmod.hpp": "c",
         "fmod_patch.h": "c",
-        "cstring": "c"
+        "cstring": "c",
+        "typeindex": "c",
+        "typeinfo": "c",
+        "processmgr.h": "c",
+        "falsojni.h": "c",
+        "ctrl.h": "c"
     }
 }

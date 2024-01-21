@@ -219,7 +219,6 @@ int pthread_rwlock_unlock_soloader(pthread_rwlock_t *rwlock) {
         return -1;
 
     int ret = pthread_rwlock_unlock(*rwlock);
-
     pthread_rwlock_destroy_soloader(*rwlock);
 
     free(*rwlock);
