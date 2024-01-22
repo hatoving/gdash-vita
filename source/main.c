@@ -25,6 +25,7 @@
 #include <psp2/ctrl.h>
 
 #include <falso_jni/FalsoJNI.h>
+#include <falso_jni/FalsoJNI_Impl.h>
 #include <so_util/so_util.h>
 #include <psp2/kernel/processmgr.h>
 #include <sched.h>
@@ -139,15 +140,15 @@ int main() {
     int (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeRender)(void) 
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeRender");
 
-    void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin)(JNIEnv * env, jobject thiz, jint id, jfloat x, jfloat y) 
+    void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin)(JNIEnv * jni, jobject thiz, jint id, jfloat x, jfloat y) 
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin");
-    //jboolean (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown)(JNIEnv * env, jobject thiz, jint keyCode) = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown");
-    void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove)(JNIEnv * env, jobject thiz, jintArray ids, jfloatArray xs, jfloatArray ys)
+    //jboolean (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown)(JNIEnv * jni, jobject thiz, jint keyCode) = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown");
+    void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove)(JNIEnv * jni, jobject thiz, jintArray ids, jfloatArray xs, jfloatArray ys)
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove");
-    void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd)(JNIEnv * env, jobject thiz, jint id, jfloat x, jfloat y)
+    void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd)(JNIEnv * jni, jobject thiz, jint id, jfloat x, jfloat y)
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd");
 
-    int (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInsertText)(JNIEnv* env, jobject thiz, jstring text)
+    int (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInsertText)(JNIEnv* jni, jobject thiz, jstring text)
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInsertText");
 
     JNI_OnLoad(&jvm);
@@ -158,6 +159,7 @@ int main() {
 
     int lastX[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
     int lastY[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
+    int lastID[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
     while (1) {
         SceTouchData touch;
@@ -168,15 +170,16 @@ int main() {
                 int y = (int)((float)touch.report[i].y * (float)544.0f / 1088.0f);
                 int id = i;
 
+                lastX[i] = x;
+                lastY[i] = y;
+                lastID[i] = i;
+
                 if (lastX[i] == -1 || lastY[i] == -1) {
                     //Java_com_twodboy_worldofgoo_DemoRenderer_nativeTouchEvent(&jni, 0, TOUCH_START, x, y, i);
                     Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin(&jni, NULL, i, x, y);
+                } else {
+                    //move
                 }
-                else
-                    Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove(&jni, NULL, (int*)i, (int*)x, (int*)y);
-
-                lastX[i] = x;
-                lastY[i] = y;
 
             } else {
                 if (lastX[i] != -1 || lastY[i] != -1) {
