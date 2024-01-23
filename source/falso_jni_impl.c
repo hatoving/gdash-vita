@@ -80,6 +80,11 @@ jobject createTextBitmapShadowStroke(int id, va_list args) {
 	return (jobject)strdup("0");
 }
 
+void terminateProcess(int id, va_list args) {
+	logv_debug("JNI: Method Call: terminateProcess() / id: %i", id);
+	sceKernelExitDeleteThread(0);
+}
+
 NameToMethodID nameToMethodId[] = {
 	{10, "getUserID", METHOD_TYPE_OBJECT},
 	{11, "getDeviceRefreshRate", METHOD_TYPE_FLOAT},
@@ -92,6 +97,7 @@ NameToMethodID nameToMethodId[] = {
 	{18, "openIMEKeyboard", METHOD_TYPE_VOID},
 	{19, "closeIMEKeyboard", METHOD_TYPE_VOID},
 	{20, "isNetworkAvailable", METHOD_TYPE_BOOLEAN},
+	{21, "terminateProcess", METHOD_TYPE_VOID},
 };
 
 MethodsBoolean methodsBoolean[] = {
@@ -118,6 +124,7 @@ MethodsVoid methodsVoid[] = {
 	{17, setKeyboardState},
 	{18, openIMEKeyboard},
 	{19, closeIMEKeyboard},
+	{21, terminateProcess}
 };
 
 /*

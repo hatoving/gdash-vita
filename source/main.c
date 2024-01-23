@@ -83,7 +83,7 @@ void fmod_init() {
         
     sceClibPrintf("sceKernelLoadStartModule %x\n", sceKernelLoadStartModule("ux0:data/libfios2.suprx", 0, NULL, 0, NULL, NULL));
     sceClibPrintf("sceKernelLoadStartModule %x\n", sceKernelLoadStartModule("ux0:data/libc.suprx", 0, NULL, 0, NULL, NULL));
-    sceClibPrintf("sceKernelLoadStartModule %x\n", sceKernelLoadStartModule("ur0:data/libfmodstudio.suprx", 0, NULL, 0, NULL, NULL));
+    sceClibPrintf("sceKernelLoadStartModule %x\n", sceKernelLoadStartModule("app0:libfmodstudio.suprx", 0, NULL, 0, NULL, NULL));
 }
 
 // For some reason, Geometry Dash doesn't create the files necessary at boot
@@ -121,6 +121,9 @@ void save_files_init() {
 float move_data[2];
 int move_id;
 
+float x_dummy;
+float y_dummy;
+
 int main() {
     sceTouchSetSamplingState(SCE_TOUCH_PORT_FRONT, SCE_TOUCH_SAMPLING_STATE_START);
 
@@ -146,22 +149,84 @@ int main() {
     void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd)(JNIEnv * jni, jobject thiz, jint id, jfloat x, jfloat y)
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd");
 
+    bool (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown)(JNIEnv* jni, jobject thiz, jint keyCode)
+        = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown");
+
     int (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInsertText)(JNIEnv* jni, jobject thiz, jstring text)
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInsertText");
 
     JNI_OnLoad(&jvm);
-    Java_org_cocos2dx_lib_Cocos2dxHelper_nativeSetApkPath(&jni, NULL, APK_PATH);
 
+    Java_org_cocos2dx_lib_Cocos2dxHelper_nativeSetApkPath(&jni, NULL, APK_PATH);
     gl_init();
     Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInit(&jni, NULL, 960, 544);
 
     int lastX[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
     int lastY[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
-    int lastID[SCE_TOUCH_MAX_REPORT] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
     while (1) {
+        static uint32_t oldpad;
+
+        SceCtrlData pad;
+		sceCtrlPeekBufferPositive(0, &pad, 1);
+
         SceTouchData touch;
         sceTouchPeek(SCE_TOUCH_PORT_FRONT, &touch, 1);
+
+        if (pad.buttons & SCE_CTRL_LEFT) {
+            x_dummy = 95;
+            y_dummy = 480;
+
+            int id_dummy = 16;
+            
+            if ((oldpad & SCE_CTRL_LEFT)) {
+                Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove(&jni, NULL, &id_dummy, &x_dummy, &y_dummy);
+            } else {
+                Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin(&jni, NULL, id_dummy, x_dummy, y_dummy);
+            }
+        } else if (oldpad & SCE_CTRL_LEFT) {
+            int id_dummy = 16;
+            Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd(&jni, NULL, id_dummy, x_dummy, y_dummy);
+        }
+        
+        if (pad.buttons & SCE_CTRL_RIGHT) {
+            x_dummy = 225;
+            y_dummy = 480;
+
+            int id_dummy = 17;
+
+            if ((oldpad & SCE_CTRL_RIGHT)) {
+                Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove(&jni, NULL, &id_dummy, &x_dummy, &y_dummy);
+            } else {
+                Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin(&jni, NULL, id_dummy, x_dummy, y_dummy);
+            }
+        } else if (oldpad & SCE_CTRL_RIGHT) {
+            int id_dummy = 17;
+            Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd(&jni, NULL, id_dummy, x_dummy, y_dummy);
+        }
+
+        if (pad.buttons & SCE_CTRL_CROSS) {
+            x_dummy = 959;
+            y_dummy = 543;
+
+            int id_dummy = 18;
+            
+            if ((oldpad & SCE_CTRL_CROSS)) {
+                Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove(&jni, NULL, &id_dummy, &x_dummy, &y_dummy);
+            } else {
+                Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin(&jni, NULL, id_dummy, x_dummy, y_dummy);
+            }
+        } else if (oldpad & SCE_CTRL_CROSS) {
+            int id_dummy = 18;
+            Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd(&jni, NULL, id_dummy, x_dummy, y_dummy);
+        }
+        
+        if ((pad.buttons & SCE_CTRL_CIRCLE) && (!(oldpad & SCE_CTRL_CIRCLE))) {
+            Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown(&jni, NULL, 0x04);
+        }
+
+        oldpad = pad.buttons;
+
         for (int i = 0; i < SCE_TOUCH_MAX_REPORT; i++) {
             if (i < touch.reportNum) {
                 float x = (float)touch.report[i].x * (float)960.0f / 1920.0f;
@@ -181,7 +246,6 @@ int main() {
 
                 lastX[i] = x;
                 lastY[i] = y;
-                lastID[i] = i;
 
             } else {
                 if (lastX[i] != -1 || lastY[i] != -1) {

@@ -28,6 +28,7 @@ extern float move_data[2];
 
 so_hook music_hook;
 so_hook move_hook;
+//so_hook http_hook;
 
 int* (* _ZN15FMODAudioEngine21getActiveMusicChannelEi)(void* this, int a2);
 
@@ -51,11 +52,11 @@ void handleTouchesMove(void *this, int size, int *ids, float *x, float *y) {
 
 void so_patch(void) {
     _ZN15FMODAudioEngine21getActiveMusicChannelEi = (void *)so_symbol(&so_mod, "_ZN15FMODAudioEngine21getActiveMusicChannelEi");
-
     patch_openssl();
 
     hook_addr(so_symbol(&so_mod, "_ZN15FMODAudioEngine14isMusicPlayingEi"), (uintptr_t)&FMODAudioEngine_isMusicPlaying_soloader);
 
     music_hook = hook_addr(so_symbol(&so_mod, "_ZN15FMODAudioEngine9playMusicESsbfi"), (uintptr_t)&FMODAudioEngine_playMusic_soloader);
     move_hook = hook_addr(so_symbol(&so_mod, "_ZN7cocos2d17CCEGLViewProtocol17handleTouchesMoveEiPiPfS2_"), (uintptr_t)&handleTouchesMove);
+    //http_hook = hook_addr(so_symbol(&so_mod, "_ZThn500_N14DailyLevelPage17dailyStatusFailedE16GJTimedLevelType11GJErrorCode"), (uintptr_t)&FailedDaily);
 }

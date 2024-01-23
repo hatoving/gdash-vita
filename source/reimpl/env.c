@@ -58,7 +58,7 @@ char * getenv_soloader(const char *var) {
         case NO_PROXY:
         case HTTPS_PROXY:
         case ALL_PROXY:
-            return NULL;
+            return "";
         default:
             logv_error("Requested unknown env var: %s", var);
             return NULL;
