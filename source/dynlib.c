@@ -1022,7 +1022,7 @@ so_default_dynlib default_dynlib[] = {
         {"_ZN4FMOD5Sound12setLoopCountEi", (uintptr_t)&_ZN4FMOD5Sound12setLoopCountEi},
         {"_ZN4FMOD5Sound7releaseEv", (uintptr_t)&_ZN4FMOD5Sound7releaseEv},
         {"FMOD_Memory_GetStats", (uintptr_t)&FMOD_Memory_GetStats},
-        {"_ZN4FMOD6System11getCPUUsageEP14FMOD_CPU_USAGE", (uintptr_t)&_ZN4FMOD6System11getCPUUsageEP14FMOD_CPU_USAGE},
+        {"_ZN4FMOD6System11getCPUUsageEP14FMOD_CPU_USAGE", (uintptr_t)&ret0},
         {"_ZN4FMOD14ChannelControl4stopEv", (uintptr_t)&_ZN4FMOD14ChannelControl4stopEv},
         {"_ZN4FMOD6System5closeEv", (uintptr_t)&_ZN4FMOD6System5closeEv},
         {"_ZN4FMOD6System7releaseEv", (uintptr_t)&_ZN4FMOD6System7releaseEv},

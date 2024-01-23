@@ -221,7 +221,7 @@ int main() {
             Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd(&jni, NULL, id_dummy, x_dummy, y_dummy);
         }
         
-        if ((pad.buttons & SCE_CTRL_CIRCLE) && (!(oldpad & SCE_CTRL_CIRCLE))) {
+        if (((pad.buttons & SCE_CTRL_CIRCLE) && (!(oldpad & SCE_CTRL_CIRCLE))) || ((pad.buttons & SCE_CTRL_START) && (!(oldpad & SCE_CTRL_START)))) {
             Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown(&jni, NULL, 0x04);
         }
 
