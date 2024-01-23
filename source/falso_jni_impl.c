@@ -82,7 +82,7 @@ jobject createTextBitmapShadowStroke(int id, va_list args) {
 
 void terminateProcess(int id, va_list args) {
 	logv_debug("JNI: Method Call: terminateProcess() / id: %i", id);
-	sceKernelExitDeleteThread(0);
+	sceKernelExitProcess(0);
 }
 
 NameToMethodID nameToMethodId[] = {
