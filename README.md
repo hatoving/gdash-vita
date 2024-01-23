@@ -41,8 +41,10 @@ In order to properly install the game, you'll have to follow these steps precise
 - Also make sure that you have `libfmodstudio.suprx`, `libc.suprx` and `libfios2.suprx` in the same folder. If you don't, follow [this guide](https://gist.github.com/hatoving/99253e1b3efdefeaf0ca66e0c5dc7089) to extract those files.
 - <u>Legally</u> obtain your copy of [Geometry Dash]([https://play.google.com/store/apps/details?id=org.hempuli.baba&hl=en_US&gl=US](https://play.google.com/store/apps/details?id=com.robtopx.geometryjump&hl=en&gl=US)
 for Android in form of an `.apk` file. [You can get all the required files directly from your phone](https://stackoverflow.com/questions/11012976/how-do-i-get-the-apk-of-an-installed-app-without-root-access) or by using any APK extractor you can find on Google Play.
-- Open the `.apk` with any zip explorer (like [7-Zip](https://www.7-zip.org/)) and extract every single audio file and folders `sfx` and `songs` from the `.apk` into `ux0:data/gdash/assets`. Example of resulting path: `ux0:data/gdash/assets/songs/10000104.ogg`, `ux0:data/gdash/assets/menuLoop.mp3`
-- Install `gdash.vpk` and extract the contents of `data.zip` into ``ux0:data/gdash/`` (from [Releases](https://github.com/hatoving/gdash-vita/releases/latest)).
+- Open the `.apk` with any zip explorer (like [7-Zip](https://www.7-zip.org/)) and extract every single audio file and folders `sfx` and `songs` from the `.apk` into `ux0:data/gdash/assets`. Example of resulting path: `ux0:data/gdash/assets/songs/10000104.ogg`, `ux0:data/gdash/assets/menuLoop.mp3`.
+- Obtain the `.so` file called `libcocos2dcpp.so` from the `.apk` and place it in `ux0:data/gdash/`.
+- Place the `.apk` file in `ux0:data/gdash/` and rename as `GeometryDash.apk`.
+- Install `gdash.vpk` and put `shader.txt` into ``ux0:data/gdash/`` (from [Releases](https://github.com/hatoving/gdash-vita/releases/latest)).
 
 # Controls
 
@@ -66,7 +68,9 @@ However, there's gamepad support to emulate some controls:
 In order to build the loader, you'll need a [vitasdk](https://github.com/vitasdk) build fully compiled with softfp usage.  
 You can find a precompiled version [here](https://github.com/vitasdk/buildscripts/releases).  
 
-Additionally, you'll need vitaGl to be compiled with these flags: ``make HAVE_GLSL_SUPPORT=1 SOFTFP_ABI=1 NO_DEBUG=1 install``
+Additionally, you'll need vitaGl to be compiled with these flags: ``make HAVE_GLSL_SUPPORT=1 SOFTFP_ABI=1 NO_DEBUG=1 install``.
+
+You also have to install FMOD onto your VitaSDK enviroment. You can do that by going installing [fmodpp](https://github.com/Rinnegatamante/fmodpp).
 
 After all these requirements are met, you can compile the loader with the following commands:
 
