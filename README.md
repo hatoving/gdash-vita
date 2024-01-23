@@ -91,3 +91,5 @@ For more information and build options, read the [CMakeLists.txt](CMakeLists.txt
 - [Andy "The FloW" Nguyen](https://github.com/TheOfficialFloW/) for the original .so loader.
 - [Rinnegatamante](https://github.com/Rinnegatamante/) and [gl33ntwine](https://github.com/v-atamanenko/) for helping me a ton with the port (+ for vitaGL by Rinnegatamante.)
 - [CatoTheYounger97](https://github.com/CatoTheYounger97/), [Dexxtrip](https://www.reddit.com/user/Dexxtrip/) and [withLogic](https://github.com/withLogic/) for testing the game out.
+
+Style of the page has been taken from https://github.com/v-atamanenko/baba-is-you-vita.
