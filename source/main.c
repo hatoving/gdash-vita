@@ -169,8 +169,8 @@ int main() {
         sceTouchPeek(SCE_TOUCH_PORT_FRONT, &touch, 1);
         for (int i = 0; i < SCE_TOUCH_MAX_REPORT; i++) {
             if (i < touch.reportNum) {
-                int x = (float)touch.report[i].x * (float)960.0f / 1920.0f;
-                int y = (float)touch.report[i].y * (float)544.0f / 1088.0f;
+                float x = (float)touch.report[i].x * (float)960.0f / 1920.0f;
+                float y = (float)touch.report[i].y * (float)544.0f / 1088.0f;
                 int id = i;
 
                 if (lastX[i] == -1 || lastY[i] == -1) {
@@ -179,7 +179,7 @@ int main() {
                     move_data[0] = (float)x;
 					move_data[1] = (float)y;
 					move_id = id;
-                    
+
                     Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove(&jni, NULL,
                         &id, &x, &y);
                 }
