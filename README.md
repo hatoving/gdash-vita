@@ -39,7 +39,7 @@ In order to properly install the game, you'll have to follow these steps precise
 
 - Make sure you have `libshacccg.suprx` in the `ur0:/data/` folder on your console. If you don't, follow [this guide](https://samilops2.gitbook.io/vita-troubleshooting-guide/shader-compiler/extract-libshacccg.suprx) to extract it.
 - Also make sure that you have `libfmodstudio.suprx`, `libc.suprx` and `libfios2.suprx` in the same folder. If you don't, follow [this guide](https://gist.github.com/hatoving/99253e1b3efdefeaf0ca66e0c5dc7089) to extract those files.
-- <u>Legally</u> obtain your copy of [Geometry Dash]([https://play.google.com/store/apps/details?id=org.hempuli.baba&hl=en_US&gl=US](https://play.google.com/store/apps/details?id=com.robtopx.geometryjump&hl=en&gl=US)
+- <u>Legally</u> obtain your copy of [Geometry Dash](https://play.google.com/store/apps/details?id=com.robtopx.geometryjump&hl=en&gl=US)
 for Android in form of an `.apk` file. [You can get all the required files directly from your phone](https://stackoverflow.com/questions/11012976/how-do-i-get-the-apk-of-an-installed-app-without-root-access) or by using any APK extractor you can find on Google Play.
 - Open the `.apk` with any zip explorer (like [7-Zip](https://www.7-zip.org/)) and extract every single audio file and folders `sfx` and `songs` from the `.apk` into `ux0:data/gdash/assets`. Example of resulting path: `ux0:data/gdash/assets/songs/10000104.ogg`, `ux0:data/gdash/assets/menuLoop.mp3`.
 - Obtain the `.so` file called `libcocos2dcpp.so` from the `.apk` and place it in `ux0:data/gdash/`.
