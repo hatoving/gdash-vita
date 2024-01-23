@@ -1,4 +1,0 @@
-[submodule "lib/falso_jni"]
-	path = lib/falso_jni
-	url = git@github.com:v-atamanenko/FalsoJNI.git
-	branch = master

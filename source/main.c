@@ -120,6 +120,9 @@ void save_files_init() {
     }
 }
 
+float move_data[2];
+int move_id;
+
 int main() {
     sceTouchSetSamplingState(SCE_TOUCH_PORT_FRONT, SCE_TOUCH_SAMPLING_STATE_START);
     soloader_init_all();
@@ -143,7 +146,7 @@ int main() {
     void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin)(JNIEnv * jni, jobject thiz, jint id, jfloat x, jfloat y) 
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin");
     //jboolean (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown)(JNIEnv * jni, jobject thiz, jint keyCode) = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown");
-    void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove)(JNIEnv * jni, jobject thiz, jintArray ids, jfloatArray xs, jfloatArray ys)
+    void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove)(JNIEnv * jni, jobject thiz, jint *ids, jfloat *xs, jfloat *ys)
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove");
     void (* Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd)(JNIEnv * jni, jobject thiz, jint id, jfloat x, jfloat y)
         = (void *)so_symbol(&so_mod, "Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd");
@@ -166,25 +169,19 @@ int main() {
         sceTouchPeek(SCE_TOUCH_PORT_FRONT, &touch, 1);
         for (int i = 0; i < SCE_TOUCH_MAX_REPORT; i++) {
             if (i < touch.reportNum) {
-                int x = (int)((float)touch.report[i].x * (float)960.0f / 1920.0f);
-                int y = (int)((float)touch.report[i].y * (float)544.0f / 1088.0f);
+                int x = (float)touch.report[i].x * (float)960.0f / 1920.0f;
+                int y = (float)touch.report[i].y * (float)544.0f / 1088.0f;
                 int id = i;
 
                 if (lastX[i] == -1 || lastY[i] == -1) {
-                    //Java_com_twodboy_worldofgoo_DemoRenderer_nativeTouchEvent(&jni, 0, TOUCH_START, x, y, i);
                     Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin(&jni, NULL, i, x, y);
                 } else {
-                    jintArray dummy_id = jni->NewIntArray(&jni, 1);
-                    jni->SetIntArrayRegion(&jni, dummy_id, 0, 1, &id);
-
-                    jfloatArray dummy_x = jni->NewFloatArray(&jni, 1);
-                    jni->SetFloatArrayRegion(&jni, dummy_x, 0, 1, &x);
-
-                    jfloatArray dummy_y = jni->NewFloatArray(&jni, 1);
-                    jni->SetFloatArrayRegion(&jni, dummy_y, 0, 1, &y);
-
+                    move_data[0] = (float)x;
+					move_data[1] = (float)y;
+					move_id = id;
+                    
                     Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove(&jni, NULL,
-                        dummy_id, dummy_x, dummy_y); ///ufhhh
+                        &id, &x, &y);
                 }
 
                 lastX[i] = x;
@@ -193,7 +190,6 @@ int main() {
 
             } else {
                 if (lastX[i] != -1 || lastY[i] != -1) {
-                    //Java_com_twodboy_worldofgoo_DemoRenderer_nativeTouchEvent(fake_env, 0, TOUCH_END, lastX[i], lastY[i], i);
                     Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd(&jni, NULL, i, lastX[i], lastY[i]);
                     lastX[i] = -1;
                     lastY[i] = -1;
