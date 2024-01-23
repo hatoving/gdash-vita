@@ -93,7 +93,6 @@ target_include_directories(${CMAKE_PROJECT_NAME}
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
                       -Wl,--whole-archive pthread -Wl,--no-whole-archive -Wl,-q,--wrap,FMOD_System_CreateSound,--wrap,FMOD_System_CreateStream
-                      openal
                       ssl
                       crypto
                       stdc++

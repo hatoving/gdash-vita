@@ -81,9 +81,9 @@ void fmod_init() {
         sceNetInit(&initparam);
     }
         
-    sceClibPrintf("sceKernelLoadStartModule %x\n", sceKernelLoadStartModule("ux0:data/libfios2.suprx", 0, NULL, 0, NULL, NULL));
-    sceClibPrintf("sceKernelLoadStartModule %x\n", sceKernelLoadStartModule("ux0:data/libc.suprx", 0, NULL, 0, NULL, NULL));
-    sceClibPrintf("sceKernelLoadStartModule %x\n", sceKernelLoadStartModule("app0:libfmodstudio.suprx", 0, NULL, 0, NULL, NULL));
+    sceKernelLoadStartModule("ur0:data/libfios2.suprx", 0, NULL, 0, NULL, NULL);
+    sceKernelLoadStartModule("ur0:data/libc.suprx", 0, NULL, 0, NULL, NULL);
+    sceKernelLoadStartModule("ur0:data/libfmodstudio.suprx", 0, NULL, 0, NULL, NULL);
 }
 
 // For some reason, Geometry Dash doesn't create the files necessary at boot
