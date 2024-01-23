@@ -43,8 +43,8 @@ FMOD_RESULT F_API __wrap_FMOD_System_CreateSound(FMOD_SYSTEM *system, const char
 
     int ret = __real_FMOD_System_CreateSound(system, fname_real, mode, exinfo, sound);
     
-    //logv_debug("FMOD SOUND RETURN!!::: %i", ret);
-    //logv_debug("FMOD SOUND CREATION!!::: %s", fname_real);
+    logv_debug("FMOD SOUND RETURN!!::: %i", ret);
+    logv_debug("FMOD SOUND CREATION!!::: %s", fname_real);
 
     return ret;
 }
@@ -55,8 +55,8 @@ FMOD_RESULT F_API __wrap_FMOD_System_CreateStream(FMOD_SYSTEM *system, const cha
 
     int ret = __real_FMOD_System_CreateStream(system, fname_real, mode, exinfo, sound);
 
-    //logv_debug("FMOD STREAM RETURN!!::: %i", ret);
-    //logv_debug("FMOD STREAM CREATION!!::: %s", fname_real);
+    logv_debug("FMOD STREAM RETURN!!::: %i", ret);
+    logv_debug("FMOD STREAM CREATION!!::: %s", fname_real);
 
     return ret;
 }
