@@ -18,9 +18,6 @@
                 "/usr/local/vitasdk/arm-vita-eabi/include",
                 "${workspaceFolder}/lib"
             ],
-            "defines": [
-                "USE_FMOD=1"
-            ],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c17",
             "cppStandard": "c++14",

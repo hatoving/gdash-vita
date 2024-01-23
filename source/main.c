@@ -32,36 +32,34 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-#ifdef USE_FMOD
-    #include <fmod/fmod.h>
+#include <fmod/fmod.h>
 
-    extern FMOD_RESULT F_API __real_FMOD_System_CreateSound(FMOD_SYSTEM *system, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound);
-    extern FMOD_RESULT F_API __real_FMOD_System_CreateStream(FMOD_SYSTEM *system, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound);
+extern FMOD_RESULT F_API __real_FMOD_System_CreateSound(FMOD_SYSTEM *system, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound);
+extern FMOD_RESULT F_API __real_FMOD_System_CreateStream(FMOD_SYSTEM *system, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound);
 
-    FMOD_RESULT F_API __wrap_FMOD_System_CreateSound(FMOD_SYSTEM *system, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound) {
-        char fname_real[256];
-        sprintf(fname_real, "%s%s", ASSETS_PATH, &name_or_data[22]);
+FMOD_RESULT F_API __wrap_FMOD_System_CreateSound(FMOD_SYSTEM *system, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound) {
+    char fname_real[256];
+    sprintf(fname_real, "%s%s", ASSETS_PATH, &name_or_data[22]);
 
-        int ret = __real_FMOD_System_CreateSound(system, fname_real, mode, exinfo, sound);
-        
-        //logv_debug("FMOD SOUND RETURN!!::: %i", ret);
-        //logv_debug("FMOD SOUND CREATION!!::: %s", fname_real);
+    int ret = __real_FMOD_System_CreateSound(system, fname_real, mode, exinfo, sound);
+    
+    //logv_debug("FMOD SOUND RETURN!!::: %i", ret);
+    //logv_debug("FMOD SOUND CREATION!!::: %s", fname_real);
 
-        return ret;
-    }
+    return ret;
+}
 
-    FMOD_RESULT F_API __wrap_FMOD_System_CreateStream(FMOD_SYSTEM *system, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound) {
-        char fname_real[256];
-        sprintf(fname_real, "%s%s", ASSETS_PATH, &name_or_data[22]);
+FMOD_RESULT F_API __wrap_FMOD_System_CreateStream(FMOD_SYSTEM *system, const char *name_or_data, FMOD_MODE mode, FMOD_CREATESOUNDEXINFO *exinfo, FMOD_SOUND **sound) {
+    char fname_real[256];
+    sprintf(fname_real, "%s%s", ASSETS_PATH, &name_or_data[22]);
 
-        int ret = __real_FMOD_System_CreateStream(system, fname_real, mode, exinfo, sound);
+    int ret = __real_FMOD_System_CreateStream(system, fname_real, mode, exinfo, sound);
 
-        //logv_debug("FMOD STREAM RETURN!!::: %i", ret);
-        //logv_debug("FMOD STREAM CREATION!!::: %s", fname_real);
+    //logv_debug("FMOD STREAM RETURN!!::: %i", ret);
+    //logv_debug("FMOD STREAM CREATION!!::: %s", fname_real);
 
-        return ret;
-    }
-#endif
+    return ret;
+}
 
 int _newlib_heap_size_user = 256 * 1024 * 1024;
 
@@ -125,12 +123,9 @@ int move_id;
 
 int main() {
     sceTouchSetSamplingState(SCE_TOUCH_PORT_FRONT, SCE_TOUCH_SAMPLING_STATE_START);
+
     soloader_init_all();
-
-    #ifdef USE_FMOD
-        fmod_init();
-    #endif
-
+    fmod_init();
     save_files_init();
 
     int (* JNI_OnLoad)(void *jvm) = (void *)so_symbol(&so_mod, "JNI_OnLoad");
