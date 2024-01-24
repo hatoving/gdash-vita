@@ -70,7 +70,7 @@ You can find a precompiled version [here](https://github.com/vitasdk/buildscript
 
 Additionally, you'll need vitaGl to be compiled with these flags: ``make HAVE_GLSL_SUPPORT=1 SOFTFP_ABI=1 NO_DEBUG=1 install``.
 
-You also have to install FMOD onto your VitaSDK enviroment. You can do that by installing [fmodpp](https://github.com/Rinnegatamante/fmodpp).
+You also have to install FMOD onto your VitaSDK enviroment. More info on how to generate the stubs and so on will be coming soon.
 
 After all these requirements are met, you can compile the loader with the following commands:
 
