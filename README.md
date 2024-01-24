@@ -25,7 +25,9 @@ This repository contains a loader of the *Android release* of Geometry Dash, bas
 
 # Set-Up (for End-Users)
 
-In order to properly install the game, you'll have to follow these steps precisely:
+In order to properly install the game, you'll have to follow these steps precisely. 
+
+## Please note that only version 2.2.13  has been tested as of 24/01/24.
 
 - Install [kubridge](https://github.com/TheOfficialFloW/kubridge/releases/) and [FdFix](https://github.com/TheOfficialFloW/FdFix/releases/) by copying `kubridge.skprx` and `fd_fix.skprx` to your taiHEN plugins folder (usually `ur0:tai`) and adding two entries to your `config.txt` under `*KERNEL`:
   
@@ -70,7 +72,7 @@ You can find a precompiled version [here](https://github.com/vitasdk/buildscript
 
 Additionally, you'll need vitaGl to be compiled with these flags: ``make HAVE_GLSL_SUPPORT=1 SOFTFP_ABI=1 NO_DEBUG=1 install``.
 
-You also have to install FMOD onto your VitaSDK enviroment. You can do that by installing [fmodpp](https://github.com/Rinnegatamante/fmodpp).
+You also have to install FMOD onto your VitaSDK enviroment. Info on how to acquire the stubs needed will need to be taken care of by you.
 
 After all these requirements are met, you can compile the loader with the following commands:
 
