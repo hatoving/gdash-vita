@@ -66,5 +66,6 @@ extern void* _ZN4FMOD12ChannelGroup10getChannelEiPPNS_7ChannelE;
 extern int _ZN4FMOD6System11createSoundEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE(void *this, const char *fname, int mode, void *exinfo, int** sound);
 extern void* _ZN4FMOD6System7lockDSPEv;
 extern void* _ZN4FMOD6System9unlockDSPEv;
+extern void* _ZN4FMOD14ChannelControl10getNumDSPsEPi;
 
 #endif

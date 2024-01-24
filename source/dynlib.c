@@ -1075,6 +1075,8 @@ so_default_dynlib default_dynlib[] = {
         {"_ZN4FMOD6System11createSoundEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE", (uintptr_t)&_ZN4FMOD6System11createSoundEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5SoundE},
         {"_ZN4FMOD6System7lockDSPEv", (uintptr_t)&_ZN4FMOD6System7lockDSPEv},
         {"_ZN4FMOD6System9unlockDSPEv", (uintptr_t)&_ZN4FMOD6System9unlockDSPEv},
+        {"_ZN4FMOD14ChannelControl10getNumDSPsEPi", (uintptr_t)&_ZN4FMOD14ChannelControl10getNumDSPsEPi},
+        //
 };
 
 void resolve_imports(so_module* mod) {
