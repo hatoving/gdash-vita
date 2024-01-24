@@ -44,7 +44,7 @@ for Android in form of an `.apk` file. [You can get all the required files direc
 - Open the `.apk` with any zip explorer (like [7-Zip](https://www.7-zip.org/)) and extract every single audio file and folders `sfx` and `songs` from the `.apk` into `ux0:data/gdash/assets`. Example of resulting path: `ux0:data/gdash/assets/songs/10000104.ogg`, `ux0:data/gdash/assets/menuLoop.mp3`.
 - Obtain the `.so` file called `libcocos2dcpp.so` from the `.apk` and place it in `ux0:data/gdash/`.
 - Place the `.apk` file in `ux0:data/gdash/` and rename as `GeometryDash.apk`.
-- Install `gdash.vpk` and put `shader.txt` into ``ux0:data/gdash/`` (from [Releases](https://github.com/hatoving/gdash-vita/releases/latest)).
+- Install `gdash.vpk` (from [Releases](https://github.com/hatoving/gdash-vita/releases/latest)).
 
 # Controls
 
