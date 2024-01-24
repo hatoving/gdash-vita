@@ -157,11 +157,35 @@ char* load_file(char const* path)
     return source;
 }
 
+char fixed_shader[] = {
+    "if (_lensCircleStrength > 0.0) {\n \
+    float dist = distance(v_texCoord * _textureScaleInv, _lensCircleOrigin);\n \
+    float k;\n \
+    if (_lensCircleStart == _lensCircleEnd) {\n \
+        if (dist >= _lensCircleEnd) {\n \
+            k = _lensCircleStrength;\n \
+        } else {\n \
+            k = 0.0f;\n \
+        }\n \
+    } else {\n \
+        k = _lensCircleStrength * (1.0 - smoothstep(_lensCircleEnd, _lensCircleStart, dist));\n \
+    }\n \
+    if (_lensCircleAdditive) gl_FragColor.rgb = gl_FragColor.rgb + (_lensCircleTint * k);\n \
+    else gl_FragColor.rgb = gl_FragColor.rgb * (1.0 - k) + (_lensCircleTint * k);\n \
+}\n \
+}"
+};
 // this is a really stupid way to fix it but fuck it lol
 void glShaderSource_soloader(GLuint shader, GLsizei count, const GLchar **string, const GLint *length) {
     if(strstr(string[1], "// SHOCKWAVE") != NULL) {
-        char* shader_text = load_file("ux0:data/gdash/shader.txt");
-        glShaderSource(shader, 1, &shader_text, NULL);
+        char *tmp = malloc(strlen(string[1]) + 8 * 1024);
+        strcpy(tmp, string[1]);
+
+        char *s2 = strstr(tmp, "if (_lensCircleStrength > 0.0) {");
+        memcpy(s2, fixed_shader, strlen(fixed_shader) + 1);
+        
+        glShaderSource(shader, 1, &tmp, NULL);
+        free(tmp);
     }
     else {
         glShaderSource(shader, count, string, length);
