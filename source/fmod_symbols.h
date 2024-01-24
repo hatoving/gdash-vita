@@ -67,5 +67,7 @@ extern int _ZN4FMOD6System11createSoundEPKcjP22FMOD_CREATESOUNDEXINFOPPNS_5Sound
 extern void* _ZN4FMOD6System7lockDSPEv;
 extern void* _ZN4FMOD6System9unlockDSPEv;
 extern void* _ZN4FMOD14ChannelControl10getNumDSPsEPi;
+extern void* _ZN4FMOD14ChannelControl9removeDSPEPNS_3DSPE;
+extern void* _ZN4FMOD3DSP7releaseEv;
 
 #endif
