@@ -25,7 +25,9 @@ This repository contains a loader of the *Android release* of Geometry Dash, bas
 
 # Set-Up (for End-Users)
 
-In order to properly install the game, you'll have to follow these steps precisely:
+In order to properly install the game, you'll have to follow these steps precisely. 
+
+## Please note that only version 2.2.13  has been tested as of 24/01/24.
 
 - Install [kubridge](https://github.com/TheOfficialFloW/kubridge/releases/) and [FdFix](https://github.com/TheOfficialFloW/FdFix/releases/) by copying `kubridge.skprx` and `fd_fix.skprx` to your taiHEN plugins folder (usually `ur0:tai`) and adding two entries to your `config.txt` under `*KERNEL`:
   
