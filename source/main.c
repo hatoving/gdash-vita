@@ -81,8 +81,8 @@ void fmod_init() {
         sceNetInit(&initparam);
     }
         
-    sceKernelLoadStartModule("ur0:data/libfios2.suprx", 0, NULL, 0, NULL, NULL);
-    sceKernelLoadStartModule("ur0:data/libc.suprx", 0, NULL, 0, NULL, NULL);
+    sceKernelLoadStartModule("vs0:sys/external/libfios2.suprx", 0, NULL, 0, NULL, NULL);
+    sceKernelLoadStartModule("vs0:sys/external/libc.suprx", 0, NULL, 0, NULL, NULL);
     sceKernelLoadStartModule("ur0:data/libfmodstudio.suprx", 0, NULL, 0, NULL, NULL);
 }
 
