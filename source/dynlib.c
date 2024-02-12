@@ -131,6 +131,67 @@ extern const short *BIONIC_toupper_tab_;
 
 static FILE __sF_fake[3];
 
+char* load_file(char const* path)
+{
+    FILE* file = fopen(path, "rb");
+    if (!file) {
+        fprintf(stderr, "Unable to open file %s\n", path);
+        return NULL;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char* source = (char*)malloc(length + 1);
+    if (!source) {
+        fprintf(stderr, "Memory allocation error\n");
+        fclose(file);
+        return NULL;
+    }
+
+    fread(source, 1, length, file);
+    fclose(file);
+
+    source[length] = '\0'; // Null-terminate the string
+    return source;
+}
+
+char fixed_shader[] = {
+    "if (_lensCircleStrength > 0.0) {\n \
+    float dist = distance(v_texCoord * _textureScaleInv, _lensCircleOrigin);\n \
+    float k;\n \
+    if (_lensCircleStart == _lensCircleEnd) {\n \
+        if (dist >= _lensCircleEnd) {\n \
+            k = _lensCircleStrength;\n \
+        } else {\n \
+            k = 0.0f;\n \
+        }\n \
+    } else {\n \
+        k = _lensCircleStrength * (1.0 - smoothstep(_lensCircleEnd, _lensCircleStart, dist));\n \
+    }\n \
+    if (_lensCircleAdditive) gl_FragColor.rgb = gl_FragColor.rgb + (_lensCircleTint * k);\n \
+    else gl_FragColor.rgb = gl_FragColor.rgb * (1.0 - k) + (_lensCircleTint * k);\n \
+}\n \
+}"
+};
+// this is a really stupid way to fix it but fuck it lol
+void glShaderSource_soloader(GLuint shader, GLsizei count, const GLchar **string, const GLint *length) {
+    if(strstr(string[1], "// SHOCKWAVE") != NULL) {
+        char *tmp = malloc(strlen(string[1]) + 8 * 1024);
+        strcpy(tmp, string[1]);
+
+        char *s2 = strstr(tmp, "if (_lensCircleStrength > 0.0) {");
+        memcpy(s2, fixed_shader, strlen(fixed_shader) + 1);
+        
+        glShaderSource(shader, 1, &tmp, NULL);
+        free(tmp);
+    }
+    else {
+        glShaderSource(shader, count, string, length);
+    }
+}
+
 void __stack_chk_fail_fake() {
 	// Some versions of libyoyo.so apparently stack smash on Startup, with this workaround we prevent the app from crashing
 	logv_debug("stack smashing detected!! on: %p\n", __builtin_return_address(0));
@@ -622,7 +683,7 @@ so_default_dynlib default_dynlib[] = {
 #ifdef USE_CG_SHADERS
         { "glShaderSource", (uintptr_t)&glShaderSourceHook },
 #else
-        { "glShaderSource", (uintptr_t)&glShaderSource },
+        { "glShaderSource", (uintptr_t)&glShaderSource_soloader },
 #endif
         { "glStencilFunc", (uintptr_t)&glStencilFunc },
         { "glStencilFuncSeparate", (uintptr_t)&glStencilFuncSeparate },
