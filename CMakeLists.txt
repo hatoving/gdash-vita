@@ -8,14 +8,14 @@ endif ()
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VITASDK}/share/vita.toolchain.cmake"
     CACHE PATH "Toolchain file")
 
-project(gdash C CXX)
+project(castleofillusion C CXX)
 
 include("${VITASDK}/share/vita.cmake" REQUIRED)
 
 # Vita application configuration
-set(VITA_APP_NAME "Geometry Dash")
-set(VITA_TITLEID "GEOMETRYD")
-set(VITA_VPKNAME "gdash")
+set(VITA_APP_NAME "Caslte of Illusion")
+set(VITA_TITLEID "CASTLEOFI")
+set(VITA_VPKNAME "coi")
 set(VITA_VERSION "01.00")
 set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12")
 
@@ -24,10 +24,8 @@ set(PSVITAIP "192.168.0.198" CACHE STRING "PSVita IP (for FTP access)")
 set(PARSECOREPATH "$ENV{PARSECOREPATH}" CACHE STRING "vita-parse-core main.py")
 
 # Game-specific definitions
-set(DATA_PATH "ux0:data/gdash/" CACHE STRING "Path to data (with trailing /)")
-set(ASSETS_PATH "ux0:data/gdash/assets/" CACHE STRING "Path to assets folder (with trailing /)")
-set(APK_PATH "${DATA_PATH}GeometryDash.apk" CACHE STRING "Path to data (with trailing /)")
-set(SO_PATH "${DATA_PATH}libcocos2dcpp.so" CACHE STRING "Path to .so")
+set(DATA_PATH "ux0:data/castleofillusion/" CACHE STRING "Path to data (with trailing /)")
+set(SO_PATH "${DATA_PATH}libViewer_GP.so" CACHE STRING "Path to .so")
 
 option(USE_SCELIBC_IO "Use SceLibcBridge for IO and some other std functions" ON)
 if (USE_SCELIBC_IO)
@@ -54,7 +52,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -g -std=gnu++20 -Wno-write-strings -Wno-ps
 
 add_executable(${CMAKE_PROJECT_NAME}
                source/main.c
-               source/openssl_patch.c
                source/dynlib.c
                source/falso_jni_impl.c
                source/patch.c
@@ -93,8 +90,6 @@ target_include_directories(${CMAKE_PROJECT_NAME}
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
                       -Wl,--whole-archive pthread -Wl,--no-whole-archive -Wl,-q,--wrap,FMOD_System_CreateSound,--wrap,FMOD_System_CreateStream
-                      ssl
-                      crypto
                       stdc++
                       vitaGL
                       vitashark
