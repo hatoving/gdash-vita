@@ -172,7 +172,9 @@ int main() {
 
         SceTouchData touch;
         sceTouchPeek(SCE_TOUCH_PORT_FRONT, &touch, 1);
-
+        
+        // "Controller" support
+        // Right now it just emulates touches based on gamepad input
         if (pad.buttons & SCE_CTRL_LEFT) {
             x_dummy = 95;
             y_dummy = 480;
